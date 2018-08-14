@@ -26,13 +26,13 @@ sub new {
 		'091B' => ['actor_name_request', 'a4', [qw(ID)]],
 		'095D' => ['buy_bulk_buyer', 'a4 a4 a*', [qw(buyerID buyingStoreID itemInfo)]], #Buying store
 		'0931' => ['buy_bulk_closeShop'],			
-		'089D' => ['buy_bulk_openShop', 'a4 c a*', [qw(limitZeny result itemInfo)]], #Selling store
+		'089D' => ['buy_bulk_openShop', 'v V C Z80 a*', [qw(len limitZeny result storeName itemInfo)]], # Buying store
 		'0965' => ['buy_bulk_request', 'a4', [qw(ID)]], #6
 		'085E' => ['character_move', 'a3', [qw(coordString)]],
 		'093A' => ['friend_request', 'a*', [qw(username)]],# len 26
 		'088F' => ['homunculus_command', 'v C', [qw(commandType, commandID)]],
 		'0897' => ['item_drop', 'a2 v', [qw(ID amount)]],
-		'088D' => ['item_list_res', 'v V2 a*', [qw(len type action itemInfo)]],
+		'088D' => ['item_list_window_selected', 'v V V a*', [qw(len type act itemInfo)]],
 		'095C' => ['item_take', 'a4', [qw(ID)]],
 		'0922' => ['map_login', 'a4 a4 a4 V C', [qw(accountID charID sessionID tick sex)]],
 		'0862' => ['party_join_request_by_name', 'Z24', [qw(partyName)]],
@@ -42,6 +42,9 @@ sub new {
 		'0930' => ['storage_item_remove', 'a2 V', [qw(ID amount)]],
 		'0881' => ['storage_password'],
 		'0898' => ['sync', 'V', [qw(time)]],		
+		'0868' => ['search_store_info', 'v C V2 C2 a*', [qw(len type max_price min_price item_count card_count item_card_list)]],
+		'0942' => ['search_store_request_next_page'],
+		'0819' => ['search_store_select', 'a4 a4 v', [qw(accountID storeID nameID)]],
 	);
 	
 	$self->{packet_list}{$_} = $packets{$_} for keys %packets;
@@ -59,7 +62,7 @@ sub new {
 		friend_request 093A
 		homunculus_command 088F
 		item_drop 0897
-		item_list_res 088D
+		item_list_window_selected 088D
 		item_take 095C
 		map_login 0922
 		party_join_request_by_name 0862
@@ -69,9 +72,12 @@ sub new {
 		storage_item_remove 0930
 		storage_password 0881
 		sync 0898
+		search_store_info 0868
+		search_store_request_next_page 0942
+		search_store_select 0819
 	);
 	
-	while (my ($k, $v) = each %packets) { $handlers{$v->[0]} = $k}
+	
 	
 	$self->{packet_lut}{$_} = $handlers{$_} for keys %handlers;
 #	elif PACKETVER == 20170419 // 2017-04-19bRagexeRE
